@@ -79,3 +79,7 @@ add mock/lite IPv4LL mechanism to android ethernet-service
 - Use random number algorithm to generate the last two code address of IPv4LL.
 - Add ARP check to avoid IP conflicts.
 
+
+</br>
+</br>
+It's is base on AOSP codebase of Android P (android 9.0.0).
