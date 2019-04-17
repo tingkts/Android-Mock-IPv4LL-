@@ -1,7 +1,7 @@
 add mock/lite IPv4LL mechanism to android ethernet-service
 
 
-
+</br>
 <u>Rough concept of IPv4LL</u>:
 
 		IP: 		  169.254.*.*
@@ -14,7 +14,7 @@ add mock/lite IPv4LL mechanism to android ethernet-service
 		IP:		169.254.*.*/16
 
 	
-
+</br>
 <u>Codebase of ethernet-service related</u>:
 
 - client side manager @ client app process
@@ -58,7 +58,7 @@ add mock/lite IPv4LL mechanism to android ethernet-service
       
   ```
 
-
+</br>
 <u>Related process/file</u>:
 
 ```
@@ -73,13 +73,14 @@ add mock/lite IPv4LL mechanism to android ethernet-service
         
 ```
 
+</br>
 <u>Patch</u>:
 
 ```
 	frameworks/opt/net/ethernet
 ```
 
-
+</br>
 <u> To-Do</u>:
 
 - Use random number algorithm to generate the last two code address of IPv4LL.
