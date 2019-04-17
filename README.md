@@ -46,16 +46,12 @@ add mock/lite IPv4LL mechanism to android ethernet-service
 - server side service @ ethernet-service
 
   ```
-  
       frameworks/opt/net/ethernet/java/com/android/server/ethernet/
           EthernetConfigStore.java
           EthernetNetworkFactory.java
           EthernetService.java
           EthernetServiceImpl.java
           EthernetTracker.java
-      
-      
-      
   ```
 
 </br>
@@ -67,10 +63,7 @@ add mock/lite IPv4LL mechanism to android ethernet-service
         system_server
 
     file:	
-        /data/misc/ethernet/ipconfig.txt //static ip storage place
-        
-        
-        
+        /data/misc/ethernet/ipconfig.txt //static ip storage place                
 ```
 
 </br>
