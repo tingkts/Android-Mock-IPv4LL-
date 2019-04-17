@@ -1,0 +1,104 @@
+From 767b73a30e2bcdb5d07540853ac8edd7264ec3c0 Mon Sep 17 00:00:00 2001
+From: tingsung <tingsung@msi.com>
+Date: Wed, 17 Apr 2019 09:32:42 +0800
+Subject: [PATCH] mock ipv4ll
+
+---
+ .../ethernet/EthernetNetworkFactory.java      | 43 ++++++++++++++++++-
+ 1 file changed, 42 insertions(+), 1 deletion(-)
+
+diff --git a/java/com/android/server/ethernet/EthernetNetworkFactory.java b/java/com/android/server/ethernet/EthernetNetworkFactory.java
+index 7ab11f6..8b1eb67 100644
+--- a/java/com/android/server/ethernet/EthernetNetworkFactory.java
++++ b/java/com/android/server/ethernet/EthernetNetworkFactory.java
+@@ -19,9 +19,11 @@ package com.android.server.ethernet;
+ import static android.net.ConnectivityManager.TYPE_ETHERNET;
+ 
+ import android.content.Context;
++import android.net.EthernetManager;
+ import android.net.IpConfiguration;
+ import android.net.IpConfiguration.IpAssignment;
+ import android.net.IpConfiguration.ProxySettings;
++import android.net.LinkAddress;
+ import android.net.LinkProperties;
+ import android.net.NetworkAgent;
+ import android.net.NetworkCapabilities;
+@@ -33,6 +35,8 @@ import android.net.NetworkSpecifier;
+ import android.net.StringNetworkSpecifier;
+ import android.net.ip.IpClient;
+ import android.net.ip.IpClient.ProvisioningConfiguration;
++import android.net.StaticIpConfiguration;
++import android.net.ProxyInfo;
+ import android.net.util.InterfaceParams;
+ import android.os.Handler;
+ import android.text.TextUtils;
+@@ -238,6 +242,10 @@ public class EthernetNetworkFactory extends NetworkFactory {
+ 
+         long refCount = 0;
+ 
++        private static final int DEFAULT_TIMEOUT_MS = (36 * 1000) * 2;// refer to IpClient.ProvisioningConfiguration.DEFAULT_TIMEOUT_MS;
++        private static final String PROP_KEY_ETHERNET_IPV4LL = "persist.net.ethernet.ipv4ll";
++        private static final String MOCK_IPV4LL_ADDRESS = "169.254.0.2/16";
++
+         private final IpClient.Callback mIpClientCallback = new IpClient.Callback() {
+             @Override
+             public void onProvisioningSuccess(LinkProperties newLp) {
+@@ -325,12 +333,41 @@ public class EthernetNetworkFactory extends NetworkFactory {
+                     }  // Otherwise, we've already called stop.
+                 }
+             };
++
++            if (android.os.SystemProperties.getBoolean(PROP_KEY_ETHERNET_IPV4LL, false)) {
++                boolean isMockIpv4llAddress = false;
++                for (LinkAddress addr : linkProperties.getLinkAddresses()) {
++                    if (addr.toString().contains(MOCK_IPV4LL_ADDRESS)) {
++                        isMockIpv4llAddress = true;
++                        break;
++                    }
++                }
++                if (isMockIpv4llAddress) {
++                    if (DBG) {
++                        Log.d(TAG, "reset mock ipv4ll");
++                    }
++                    IpConfiguration ipConfig = new IpConfiguration();
++                    ipConfig.setIpAssignment(IpAssignment.DHCP);
++                    setIpConfig(ipConfig);
++                }
++            }
+         }
+ 
+         void onIpLayerStopped(LinkProperties linkProperties) {
+             // This cannot happen due to provisioning timeout, because our timeout is 0. It can only
+             // happen if we're provisioned and we lose provisioning.
+             stop();
++
++            if (android.os.SystemProperties.getBoolean(PROP_KEY_ETHERNET_IPV4LL, false)) {
++                Log.d(TAG, "mock ipv4ll address");
++                StaticIpConfiguration staticIpConfig = new StaticIpConfiguration();
++                staticIpConfig.ipAddress = new LinkAddress(MOCK_IPV4LL_ADDRESS);
++                IpConfiguration ipConfig = new IpConfiguration(IpAssignment.STATIC,
++                     ProxySettings.NONE, staticIpConfig,
++                     ProxyInfo.buildDirectProxy(null, 0));
++                setIpConfig(ipConfig);
++            }
++
+             // If the interface has disappeared provisioning will fail over and over again, so
+             // there is no point in starting again
+             if (null != InterfaceParams.getByName(name)) {
+@@ -423,8 +460,12 @@ public class EthernetNetworkFactory extends NetworkFactory {
+                         .withStaticConfiguration(config.getStaticIpConfiguration())
+                         .build();
+             } else {
++                int dhcpProvisionTimeout = 0;
++                if (android.os.SystemProperties.getBoolean(PROP_KEY_ETHERNET_IPV4LL, false)) {
++                    dhcpProvisionTimeout = DEFAULT_TIMEOUT_MS;
++                }
+                 provisioningConfiguration = IpClient.buildProvisioningConfiguration()
+-                        .withProvisioningTimeoutMs(0)
++                        .withProvisioningTimeoutMs(dhcpProvisionTimeout)
+                         .build();
+             }
+ 
+-- 
+2.21.0
+
