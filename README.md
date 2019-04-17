@@ -7,14 +7,13 @@ add mock/lite IPv4LL mechanism to android ethernet-service
 		IP: 		  169.254.*.*
 		Broadcast: 	  169.254.255.255
 		Mask:		  255.255.0.0
-		DNS, Gateway  null
+		DNS, Gateway      null
 	
 		or
 		
-		IP:			  169.254.*.*/16
+		IP:		169.254.*.*/16
 
-
-​		
+	
 
 <u>Codebase of ethernet-service related</u>:
 
@@ -58,6 +57,7 @@ add mock/lite IPv4LL mechanism to android ethernet-service
       
       
   ```
+
 
 <u>Related process/file</u>:
 
