@@ -82,4 +82,5 @@ add mock/lite IPv4LL mechanism to android ethernet-service
 
 </br>
 </br>
-It's is base on AOSP codebase of Android P (android 9.0.0).
+
+<p align="right">Base on Android P (android 9.0.0).</p>
